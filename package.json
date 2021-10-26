@@ -1,0 +1,38 @@
+{
+  "name": "@ledgerhq/xpub-scan-interpreter",
+  "version": "0.0.1",
+  "bin": {
+    "xpub-scan": "./lib/main.js"
+  },
+  "scripts": {
+    "build": "tsc && chmod +x ./lib/main.js",
+    "test": "jest",
+    "lint": "eslint .",
+    "ts:check": "tsc --noEmit",
+    "prettier": "prettier --write .",
+    "ci": "yarn lint && yarn ts:check && prettier --list-different . && yarn test --passWithNoTests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com:LedgerHQ/xpub-scan-interpreter.git"
+  },
+  "author": "Guillaume Lethuillier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LedgerHQ/xpub-scan-interpreter"
+  },
+  "homepage": "https://github.com/LedgerHQ/xpub-scan-interpreter#readme",
+  "devDependencies": {
+    "@types/chalk": "^2.2.0",
+    "@types/node": "^16.11.4",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.2.0",
+    "chalk": "^4.1.2",
+    "eslint": "^8.1.0",
+    "jest": "^27.3.1",
+    "prettier": "^2.4.1"
+  },
+  "dependencies": {
+    "typescript": "^4.4.4"
+  }
+}
