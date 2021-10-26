@@ -1,6 +1,6 @@
 {
   "name": "@ledgerhq/xpub-scan-interpreter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "bin": {
     "xpub-scan-interpreter": "./lib/main.js"
   },
