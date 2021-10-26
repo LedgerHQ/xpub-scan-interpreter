@@ -116,7 +116,7 @@ function identifyOutOfSync(
     const comparison = comparisons[i];
     if (comparison.status.startsWith("Missing")) {
       comparisons.splice(i, 1);
-      interpretation = "Out of sync "
+      interpretation = "out of sync "
         .concat(latest ? "since " : "up to ")
         .concat(comparison.actual.date!);
       outOfSyncCount++;
