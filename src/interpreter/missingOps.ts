@@ -11,6 +11,9 @@ function identifyPaginationIssue(
   const missingOperationsIndices = new Set<number>();
 
   comparisons.forEach(function (comparison, index) {
+    // pattern revealing a possible pagination issue:
+    // (a) missing operation that is, so far, non specific, AND
+    // (b) the previous operation is also a nonspecific missing one
     if (comparison.status.startsWith("Missing")) {
       if (previousIsMissing) {
         missingOperationsIndices.add(index - 1);
@@ -31,6 +34,9 @@ function identifyPaginationIssue(
   if (missingFromPaginationIssueCount != 0) {
     return {
       interpretation: "pagination issue",
+      // identification of pagination issues is ambiguous
+      // as clusters of nonspecific missing operations can potentially
+      // be just coincidental:
       certainty: false,
       interpretedItemsCount: missingFromPaginationIssueCount,
     };
@@ -55,6 +61,8 @@ function identifyNonspecificMissingOperations(
   if (missingOperationsCount != 0) {
     return {
       interpretation: "nonspecific missing operation",
+      // identification of nonspecific missing operations is certain
+      // as this category is vague (catch-all category):
       certainty: true,
       interpretedItemsCount: missingOperationsCount,
     };
@@ -75,10 +83,15 @@ function identifyDusts(comparisons: Comparison[]): Interpretation | undefined {
 
     const amount = comparison.actual.amount;
 
+    // a dust operation is:
+    // (a) a missing operation
+    // (b) which is a received one, AND
+    // (c) whose amount is under a given threshold
+
     if (
       comparison.status.startsWith("Missing") &&
-      comparison.actual.operationType === "Received" &&
-      Number(amount) < DUST_THRESHOLD
+      comparison.actual.operationType?.startsWith("Received") &&
+      Number(amount) <= DUST_THRESHOLD
     ) {
       comparisons.splice(i, 1);
       dustsCount++;
@@ -88,6 +101,8 @@ function identifyDusts(comparisons: Comparison[]): Interpretation | undefined {
   if (dustsCount != 0) {
     return {
       interpretation: "dust",
+      // identification of dust operations is uncertain (at this stage)
+      // as the threshold should be dynamic:
       certainty: false,
       interpretedItemsCount: dustsCount,
     };
@@ -128,6 +143,9 @@ function identifyOutOfSync(
   if (outOfSyncCount != 0) {
     interpretations.push({
       interpretation,
+      // identification of out of sync operations is certain
+      // as they are spotted by reference to the beginning or
+      // the end of the list of comparisons:
       certainty: true,
       interpretedItemsCount: outOfSyncCount,
     });

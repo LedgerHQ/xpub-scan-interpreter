@@ -28,37 +28,42 @@ function translate(interpretation: Interpretation): string {
 
   let sentence = "";
   const plural = itemsCount! > 1 || false;
+  const itemsCountsAsString = itemsCount!.toLocaleString();
 
   switch (interpretationStatus) {
+    // dust: `there is|are _n_ dust operation|s`
     case "dust":
       sentence += `there ${plural ? "are " : "is "}`;
-      sentence += `${itemsCount!.toLocaleString()} dust operation${
-        plural ? "s" : ""
-      }`;
+      sentence += `${itemsCountsAsString} dust operation${plural ? "s" : ""}`;
       break;
 
+    // pagination issue: `there is|are _n_ operation|s missing because of a pagination issue`
     case "pagination issue":
       sentence += `there ${plural ? "are " : "is "}`;
-      sentence += `${itemsCount!.toLocaleString()} operation${
+      sentence += `${itemsCountsAsString} operation${
         plural ? "s" : ""
       } missing because of a pagination issue`;
       break;
 
+    // nonspecific missing operation: `_n_ nonspecific operation|s is|are missing`
     case "nonspecific missing operation":
-      sentence += `${itemsCount!.toLocaleString()} nonspecific operation`;
+      sentence += `${itemsCountsAsString} nonspecific operation`;
       sentence += `${plural ? "s are" : " is"} missing`;
       break;
 
+    // duplicated operation: `_n_ operation|s is|are duplicated`
     case "duplicated operation":
-      sentence += `${itemsCount!.toLocaleString()} operation${
+      sentence += `${itemsCountsAsString} operation${
         plural ? "s are" : " is"
       } duplicated`;
 
       break;
 
+    // nonduplicated operation: `there is|are _n_ operation|s which is an|which are extra operation|s
+    //                          `but not a| duplication|s of an| existing operation|s`
     case "nonduplicated extra operation":
       sentence += `there ${plural ? "are " : "is "}`;
-      sentence += `${itemsCount!.toLocaleString()} operation${
+      sentence += `${itemsCountsAsString} operation${
         plural ? "s which are" : " which is an"
       } `;
       sentence += `extra operation${plural ? "s" : ""} but `;
@@ -67,37 +72,37 @@ function translate(interpretation: Interpretation): string {
       } existing operation${plural ? "s" : ""}`;
       break;
 
+    // mismatches: `_n_ operation|s has|have an erroneous _mismatchType_`
     case "Mismatch: addresses":
-      sentence += `${itemsCount!.toLocaleString()} operation${
+      sentence += `${itemsCountsAsString} operation${
         plural ? "s have" : " has"
       } an erroneous derived address`;
       break;
-
     case "Mismatch: amounts":
-      sentence += `${itemsCount!.toLocaleString()} operation${
+      sentence += `${itemsCountsAsString} operation${
         plural ? "s have" : " has"
       } an erroneous amount`;
       break;
-
     case "Mismatch: token amounts":
-      sentence += `${itemsCount!.toLocaleString()} token-related operation${
+      sentence += `${itemsCountsAsString} token-related operation${
         plural ? "s have" : " has"
       } an erroneous amount`;
       break;
-
     case "Mismatch: token tickers":
-      sentence += `${itemsCount!.toLocaleString()} token-related operation${
+      sentence += `${itemsCountsAsString} token-related operation${
         plural ? "s have" : " has"
       } an erroneous ticker`;
       break;
 
+    // unknown: `there is|are _n_ comparison|s that is|that are unknown (_statuses_)`
     case interpretationStatus.match(/^unknown.*/)?.input:
       sentence += `there ${plural ? "are " : "is "}`;
-      sentence += `${itemsCount!.toLocaleString()} comparison${
+      sentence += `${itemsCountsAsString} comparison${
         plural ? "s that are" : " that is"
       } ${interpretationStatus}`;
       break;
 
+    // catch-all: just return the interpretation status
     default:
       sentence = interpretationStatus;
       break;
@@ -121,6 +126,7 @@ function translateIntoHumanLanguage(interpretations: Interpretation[]) {
             .concat(", ")
         : "";
 
+    // if the interpretation is uncertain, use a random indicator of uncertainty
     if (!certain) {
       translation += `${uncertaintyWords[i % uncertaintyWords.length]} `;
     }
@@ -128,7 +134,10 @@ function translateIntoHumanLanguage(interpretations: Interpretation[]) {
     translation += `${translate(interpretation)}. `;
   });
 
-  return translation.charAt(0).toUpperCase() + translation.slice(1);
+  // ensure that the first char of the sentence is uppercased
+  translation = translation.charAt(0).toUpperCase() + translation.slice(1);
+
+  return translation;
 }
 
 export { translateIntoHumanLanguage };

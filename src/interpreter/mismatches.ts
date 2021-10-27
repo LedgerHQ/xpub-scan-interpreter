@@ -19,6 +19,8 @@ function identifyMismatches(
   if (mismatchesCount != 0) {
     return {
       interpretation: mismatchType,
+      // identification of mismatching operations is certain
+      // as this category is unambiguous:
       certainty: true,
       interpretedItemsCount: mismatchesCount,
     };

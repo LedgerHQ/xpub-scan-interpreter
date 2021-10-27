@@ -12,6 +12,10 @@ function identifyDuplicatedOperations(
       continue;
     }
 
+    // an operation is duplicated when:
+    // (a) it is an extra operation, AND
+    // (b) it appears somewhere else in the report
+    //     (i.e., same txid, amount, and operation type)
     const txid = comparison.imported.txid;
     const amount = comparison.imported.amount;
     const operationType = comparison.imported.operationType;
@@ -23,9 +27,6 @@ function identifyDuplicatedOperations(
         comparison.imported.operationType === operationType
     ).length;
 
-    // an operation is duplicated when:
-    // (a) it is an extra operation, AND
-    // (b) it appears somewhere else in the report
     if (comparison.status === "Extra Operation" && txidsOccurrences >= 2) {
       comparisons.splice(i, 1);
       duplicatedOperations.push(txid!);
@@ -37,6 +38,9 @@ function identifyDuplicatedOperations(
   if (duplicatedOperationsCount != 0) {
     return {
       interpretation: "duplicated operation",
+      // identification of duplicated operations is certain
+      // as their comparison status is unambiguous (`Extra Operation`)
+      // as well as their duplicated nature:
       certainty: true,
       interpretedItemsCount: duplicatedOperationsCount,
     };
@@ -65,6 +69,9 @@ function identifyUniqueExtraOperations(
   if (uniqueExtraOperations != 0) {
     return {
       interpretation: "nonduplicated extra operation",
+      // identification of duplicated operations is certain
+      // as their comparison status is unambiguous (`Extra Operation`)
+      // as well as their unique nature:
       certainty: true,
       interpretedItemsCount: uniqueExtraOperations,
     };
