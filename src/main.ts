@@ -46,13 +46,17 @@ function getStatistics(xpubScanReport: any) {
   const matchesCount = comparisons.filter((comparison: Comparison) =>
     comparison.status.includes("Match")
   ).length;
-  const mismatchesCount = comparisonsCount - matchesCount;
+  const skippedCount = comparisons.filter(
+    (comparison: Comparison) => comparison.status === "Skipped"
+  ).length;
+  const mismatchesCount = comparisonsCount - skippedCount - matchesCount;
 
   const stats: Statistics = {
     occurrences: {
       comparisons: comparisonsCount,
       matches: matchesCount,
       mismatches: mismatchesCount,
+      skipped: skippedCount,
     },
   };
 

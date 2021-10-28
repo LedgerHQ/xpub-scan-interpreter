@@ -1,5 +1,6 @@
 type InterpretationStatus =
   | "perfect matching"
+  | "skipped comparisons"
   | "nonduplicated extra operation"
   | "duplicated operation"
   | "pagination issue"
@@ -39,6 +40,7 @@ interface Statistics {
     comparisons: number;
     matches: number;
     mismatches: number;
+    skipped: number;
   };
 }
 

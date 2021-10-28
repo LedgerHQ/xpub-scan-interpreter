@@ -21,18 +21,57 @@ import { identifyUnknownOperations } from "./unknownComparisons";
 
 import chalk from "chalk";
 
+// identify comparisons that has been skipped because they have reached
+// the block height upper limit set by the user or automatically defined
+// by Xpub Scan
+function identifySkippedComparisons(comparisons: Comparison[]) {
+  let skippedCount = 0;
+
+  for (let i = comparisons.length - 1; i >= 0; i--) {
+    const comparison = comparisons[i];
+    if (comparison.status === "Skipped") {
+      comparisons.splice(i, 1);
+      skippedCount++;
+    }
+  }
+
+  if (skippedCount != 0) {
+    return {
+      interpretation: "skipped comparisons",
+      certainty: true,
+      interpretedItemsCount: skippedCount,
+    };
+  }
+
+  return undefined;
+}
+
 function getInterpretation(
   comparisons: Comparison[],
   stats: Statistics
 ): Interpretation[] {
   let interpretations: Interpretation[] = [];
 
+  // -------------------
+  // SKIPPED COMPARISONS
+  // -------------------
+  console.log(chalk.greenBright("Processing skipped comparisons"));
+
+  const skippedComparison = identifySkippedComparisons(comparisons);
+
+  if (typeof skippedComparison !== "undefined") {
+    interpretations.push(skippedComparison);
+  }
+
   // -----------------
   // PERFECT MATCHING
   // -----------------
 
   // (matches count === comparisons count)
-  if (stats.occurrences.matches === stats.occurrences.comparisons) {
+  if (
+    stats.occurrences.matches ===
+    stats.occurrences.comparisons - stats.occurrences.skipped
+  ) {
     interpretations.push({
       interpretation: "perfect matching",
       certainty: true,

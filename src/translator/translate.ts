@@ -28,9 +28,23 @@ function translate(interpretation: Interpretation): string {
 
   let sentence = "";
   const plural = itemsCount! > 1 || false;
-  const itemsCountsAsString = itemsCount!.toLocaleString();
+  const itemsCountsAsString = itemsCount?.toLocaleString();
 
   switch (interpretationStatus) {
+    // perfect matching: `No issue detected`
+    case "perfect matching":
+      sentence += "No issue has been detected";
+      break;
+
+    // skipped comparisons: `_n_ comparison|s has|have been skipped because the block
+    //                      `height upper limit has been reached`
+    case "skipped comparisons":
+      sentence += `${itemsCountsAsString} comparison${
+        plural ? "s have" : "has"
+      } been skipped `;
+      sentence += `because the block height upper limit has been reached`;
+      break;
+
     // dust: `there is|are _n_ dust operation|s`
     case "dust":
       sentence += `there ${plural ? "are " : "is "}`;
